@@ -5,15 +5,16 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 
-public class TestConnectionJdbc {
+public class TestLecture {
 
 	public static void main(String[] args) {
 		
-		// achtung, ne pas écrire ".properties"
-		ResourceBundle configFile = ResourceBundle.getBundle("database");
+		ResourceBundle configFile = ResourceBundle.getBundle("database"); // Ne pas écrire ".properties"
 		String driverClass	= configFile.getString("db.driver");
 		String dbUrl 		= configFile.getString("db.url");
 		String dbUserName 	= configFile.getString("db.user.name");
@@ -22,6 +23,10 @@ public class TestConnectionJdbc {
 		// Chargement du Driver de la DB MySQL (on peut faire de même avec MariaDB)
 		try {
 			Class.forName(driverClass);
+			// Class.forName() va charger la classe dont le nom est passée en paramètre
+			// Les blocs statiques de celles-ci vont s'exécuter
+			// notamment pour la driver, la méthode DriverManager.registerDriver(new Driver());
+			// qui nous permet de charger le pilote nécessaire à la connexion à la DB
 		} catch (ClassNotFoundException e) {
 			System.out.println("Echec de chargement du Driver");
 		}
@@ -40,33 +45,35 @@ public class TestConnectionJdbc {
 		try {
 			
 			statement = connection.createStatement();
-			// Requête de création d'un abonne
-			int resultInsert = statement.executeUpdate(
-					"INSERT INTO abonne(prenom, nom, date_naissance, adresse, code_postal, "
-					+ "ville, date_inscription, date_fin_abo) "
-					+ "VALUES "
-					+ "('Sophie', 'TELLIER', '1984-07-23', '43 impasse Lievin', '34000',"
-					+ "'Montpellier', '2011-08-30', '2021-01-13')");
-			
-			System.out.println("Nombre de lignes affectées par la requête réalisée : " + resultInsert);
-			
-			// Requête de suppression de plusieurs abonnes
-//			int resultDelete = statement.executeUpdate("DELETE FROM abonne WHERE ville = 'NICE'");
-//			System.out.println("Nombre de lignes affectées par la requête réalisée : " + resultDelete);
-//			
-			
-			// Affichage de tous les abonnés et du nombre de lignes retournées
-			int count = 0;
+		
+			// Affichage et stockage de tous les abonnés et du nombre de lignes retournées
+			List<Abonne> listeAbonnes = new ArrayList<>();
 			System.out.println("Liste des abonnés : ");
 			ResultSet curseur = statement.executeQuery("SELECT * FROM abonne ORDER BY date_naissance DESC");
 			while(curseur.next()) {
-				count++;
-				Integer id = curseur.getInt("id");
-				String nom = curseur.getString("nom");
-				Date date_naissance = curseur.getDate("date_naissance");
-				System.out.println("id = " + id + " - " + nom.toUpperCase());
+				
+				Integer id 					= curseur.getInt("id");
+				String 	nom 				= curseur.getString("nom");
+				String 	prenom 				= curseur.getString("prenom");
+				Date 	date_naissance 		= curseur.getDate("date_naissance");
+				String 	adresse 			= curseur.getString("adresse");
+				String 	code_postal 		= curseur.getString("code_postal");
+				String 	ville 				= curseur.getString("ville");
+				Date 	date_inscription 	= curseur.getDate("date_inscription");
+				Date 	date_fin_abo 		= curseur.getDate("date_fin_abo");
+				
+				// Creation d'une instance Abonne pour chaque ligne retournée par la requête
+				Abonne abo = new Abonne(id, prenom, nom, date_naissance, adresse, 
+						code_postal, ville, date_inscription, date_fin_abo);
+				
+				// Stockage de l'abonné créé dans ma liste d'abonnés
+				listeAbonnes.add(abo);
 			}
-			System.out.println(count + " lignes retournées");
+			
+			// Affichage de tous les Abonne de ma liste
+			for (Abonne abo : listeAbonnes) {
+				System.out.println(abo);
+			}
 			
 			curseur.close();
 			statement.close();
