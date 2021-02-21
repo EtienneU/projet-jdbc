@@ -10,7 +10,7 @@ public class TestConfig {
 		ResourceBundle configFile = ResourceBundle.getBundle("data"); // achtung, ne pas écrire ".properties"
 
 //		System.out.println(configFile.getClass().getSimpleName());
-		String configFimeName = configFile.getString("nom");
+		String configFimeName = configFile.getString("date.naissance");
 //		System.out.println(configFimeName);
 		
 		Enumeration<String> keys = configFile.getKeys();
