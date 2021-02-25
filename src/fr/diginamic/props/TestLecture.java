@@ -25,7 +25,7 @@ public class TestLecture {
 			Class.forName(driverClass);
 			// Class.forName() va charger la classe dont le nom est passée en paramètre
 			// Les blocs statiques de celles-ci vont s'exécuter
-			// notamment pour la driver, la méthode DriverManager.registerDriver(new Driver());
+			// notamment pour le driver, la méthode DriverManager.registerDriver(new Driver());
 			// qui nous permet de charger le pilote nécessaire à la connexion à la DB
 		} catch (ClassNotFoundException e) {
 			System.out.println("Echec de chargement du Driver");
